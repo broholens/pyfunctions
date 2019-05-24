@@ -3,19 +3,20 @@
 
 
 
-### Installation
+## Installation
 
-##### Simple Installation
+The latest version of `pyfunctions` can be acquired via pip:
 
-​    `pip install pyfunctions`
+```
+pip install pyfunctions
+```
 
-##### Development Installation
+It's also possible to clone the source:
 
-​    `git clone https://github.com/broholens/pyfunctions.git`
-
-​    `pip install -r requirements.txt` 
-
-
+```bash
+$ git clone https://github.com/broholens/pyfunctions.git
+$ pip install -r requirements.txt
+```
 
 ### Quickstart
 
