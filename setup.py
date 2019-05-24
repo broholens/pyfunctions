@@ -8,6 +8,7 @@
 import io
 import os
 import sys
+import datetime
 from shutil import rmtree
 
 from setuptools import find_packages, setup, Command
@@ -19,18 +20,28 @@ URL = 'https://github.com/broholens/pyfunctions'
 EMAIL = 'zzwcng@126.com'
 AUTHOR = 'zz'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '2019.5.24'
+
+now = datetime.datetime.now()
+str_now = str(now).split('.')[0]
+VERSION = str_now.replace('-', '.').replace(' ', '.').replace(':', '.')
+
+
+def load_requirements():
+    """load requirements from txt file"""
+    with open('requirements.txt', 'r') as req:
+        requirements = [line.strip() for line in req.readlines()]
+    return requirements
 
 # What packages are required for this module to be executed?
-REQUIRED = [
-    'chardet==3.0.4',
-    'requests==2.21.0',
-    'html2text==2018.1.9',
-    'w3lib==1.20.0',
-    'lxml==4.3.3',
-    'fake-useragent==0.1.11',
-    'selenium==3.141.0'
-]
+# REQUIRED = [
+#     'chardet==3.0.4',
+#     'requests==2.21.0',
+#     'html2text==2018.1.9',
+#     'w3lib==1.20.0',
+#     'lxml==4.3.3',
+#     'fake-useragent==0.1.11',
+#     'selenium==3.141.0'
+# ]
 
 # What packages are optional?
 EXTRAS = {
@@ -93,6 +104,8 @@ class UploadCommand(Command):
         os.system('twine upload dist/*')
 
         self.status('Pushing git tags…')
+        # remove tag already exists
+        # os.system('git tag -d v{0}'.format(about['__version__']))
         os.system('git tag v{0}'.format(about['__version__']))
         os.system('git push --tags')
 
@@ -117,7 +130,7 @@ setup(
     # entry_points={
     #     'console_scripts': ['mycli=mymodule:cli'],
     # },
-    install_requires=REQUIRED,
+    install_requires=load_requirements(),
     extras_require=EXTRAS,
     include_package_data=True,
     license='MIT',
