@@ -19,7 +19,7 @@ $ pip install -r requirements.txt
 ## Quickstart
 
   ```python
-  import functions
+  from pyfunctions import functions
   text = functions.url2text('http://www.mogojob.com/')
   ``` 
   ```bash
