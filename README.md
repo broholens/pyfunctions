@@ -38,6 +38,7 @@ $ pip install -r requirements.txt
 2. 发布包遇到错误: [bdist_wheel报错][2]
 3. 首次发布失败(包名重复),更正后再次执行遭遇`tag already exists`,需要删除tag. `git tag -d v2018.5.24`
 4. `pipreqs`自动生成项目`requirements.txt`: `pipreqs . --encoding=utf8`
+5. `response._content`
 
 [1]: https://github.com/kennethreitz/setup.py
 [2]: https://yq.aliyun.com/articles/644640
