@@ -113,33 +113,36 @@ def load_cookies(filename):
 
 def make_driver(driver='chrome', load_img=False):
     """只支持chrome和phantomjs"""
+    driver = driver.lower()
     if driver == 'phantomjs':
         dcap = dict(DesiredCapabilities.PHANTOMJS)
         dcap["phantomjs.page.settings.userAgent"] = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'
         dcap["phantomjs.page.settings.loadImages"] = load_img
         d = webdriver.PhantomJS(desired_capabilities=dcap)
-        return d
-    # 创建chrome并配置
-    ops = webdriver.ChromeOptions()
-    ops.add_argument('--headless')
-    ops.add_argument('--no-sandbox')
-    ops.add_argument('--disable-gpu')
-    ops.add_argument('--start-maximized')
-    # ops.add_argument('--incognito')
-    ops.add_argument('lang=zh_CN')
-    if load_img is False:
-        prefs = {"profile.managed_default_content_settings.images": 2}
-        ops.add_experimental_option("prefs", prefs)
-    # 解决window.navigator.webdriver=True的问题
-    # https://wwwhttps://www.cnblogs.com/presleyren/p/10771000.html.cnblogs.com/presleyren/p/10771000.html
-    ops.add_experimental_option('excludeSwitches', ['enable-automation'])
-    ops.add_argument('user-agent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36"')
-    try:
-        # selenium兼容问题
-        d = webdriver.Chrome(options=ops)
-    except:
-        d = webdriver.Chrome(chrome_options=ops)
-    # d.set_window_size(1024,768)
+    elif driver == 'chrome':
+        # 创建chrome并配置
+        ops = webdriver.ChromeOptions()
+        ops.add_argument('--headless')
+        ops.add_argument('--no-sandbox')
+        ops.add_argument('--disable-gpu')
+        ops.add_argument('--start-maximized')
+        # ops.add_argument('--incognito')
+        ops.add_argument('lang=zh_CN')
+        if load_img is False:
+            prefs = {"profile.managed_default_content_settings.images": 2}
+            ops.add_experimental_option("prefs", prefs)
+        # 解决window.navigator.webdriver=True的问题
+        # https://wwwhttps://www.cnblogs.com/presleyren/p/10771000.html.cnblogs.com/presleyren/p/10771000.html
+        ops.add_experimental_option('excludeSwitches', ['enable-automation'])
+        ops.add_argument('user-agent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36"')
+        try:
+            # selenium兼容问题
+            d = webdriver.Chrome(options=ops)
+        except:
+            d = webdriver.Chrome(chrome_options=ops)
+    else:
+        raise ValueError('Unknown argument %s. Support chrome and phantomjs only.' % driver)
+    d.set_window_size(1024, 786)
     return d
 
 
@@ -158,5 +161,11 @@ def generate_cookies_dir():
     # 使用os.removedirs报错
     for old_cookies in old_cookies_dirs:
         shutil.rmtree(old_cookies)
-
+        
     return today_cookies_dir
+
+
+def save_response_content(response, output_file):
+    """save response as a png file"""
+    with open(output_file, 'wb')as f:
+        f.write(response._content)
