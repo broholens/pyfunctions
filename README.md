@@ -30,7 +30,7 @@ $ pip install -r requirements.txt
 ## TODO
 
 - ~~requirements.txt自动加载到setup.py中~~
-
+- long description Markdown file render error.
 
 ## 开发小记
 
@@ -39,6 +39,9 @@ $ pip install -r requirements.txt
 3. 首次发布失败(包名重复),更正后再次执行遭遇`tag already exists`,需要删除tag. `git tag -d v2018.5.24`
 4. `pipreqs`自动生成项目`requirements.txt`: `pipreqs . --encoding=utf8`
 5. `response._content`
+6. `python setup.py upload` [400 Error. Invalid or non-existent authentication.][3]  ~/.pypirc
+7. `python setup.py upload` [400 Error. The description failed to render.][3] long_description
 
 [1]: https://github.com/kennethreitz/setup.py
 [2]: https://yq.aliyun.com/articles/644640
+[3]: http://www.zhimengzhe.com/bianchengjiaocheng/qitabiancheng/243040.html
