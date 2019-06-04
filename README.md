@@ -30,8 +30,8 @@ $ pip install -r requirements.txt
 ## TODO
 
 - ~~requirements.txt自动加载到setup.py中~~
-- long description Markdown file render error.
-- fake_useragent.errors.FakeUserAgentError: Maximum amount of retries reached
+- ~~long description Markdown file render error.~~
+- ~~fake_useragent.errors.FakeUserAgentError: Maximum amount of retries reached~~
 
 ## 开发小记
 
