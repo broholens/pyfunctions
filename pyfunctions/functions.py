@@ -5,6 +5,8 @@ import random
 import glob
 import shutil
 import json
+from os import walk
+from os.path import join, splitext, getsize
 import chardet
 import requests
 import html2text
@@ -127,7 +129,8 @@ def make_driver(driver="chrome", load_img=False):
     driver = driver.lower()
     if driver == "phantomjs":
         dcap = dict(DesiredCapabilities.PHANTOMJS)
-        dcap["phantomjs.page.settings.userAgent"] = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36"
+        dcap[
+            "phantomjs.page.settings.userAgent"] = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36"
         dcap["phantomjs.page.settings.loadImages"] = load_img
         d = webdriver.PhantomJS(desired_capabilities=dcap)
     elif driver == "chrome":
@@ -145,7 +148,8 @@ def make_driver(driver="chrome", load_img=False):
         # 解决window.navigator.webdriver=True的问题
         # https://wwwhttps://www.cnblogs.com/presleyren/p/10771000.html.cnblogs.com/presleyren/p/10771000.html
         ops.add_experimental_option("excludeSwitches", ["enable-automation"])
-        ops.add_argument('user-agent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36"')
+        ops.add_argument(
+            'user-agent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36"')
         try:
             # selenium兼容问题
             d = webdriver.Chrome(options=ops)
@@ -182,3 +186,43 @@ def save_response_content(response, output_file):
     """save response as a png file"""
     with open(output_file, "wb") as f:
         f.write(response._content)
+
+
+def get_dir_size(dir_path, unit='M', include_type=(".*",)):
+    """
+    获取指定文件夹大小
+    :param unit: 返回单位: K, M, G
+    :param include_type: 包含的文件类型：.*表示全部
+    :return:
+    """
+    total_size = 0
+    for root, dirs, files in walk(dir_path):
+        for file in files:
+            file_ext = splitext(file)[1]
+            if '.*' not in include_type and file_ext not in include_type:
+                continue
+
+            file_full_path = join(root, file)
+            try:
+                total_size += getsize(file_full_path)
+            except FileNotFoundError:
+                continue
+    return convert_byte_size(total_size, unit)
+
+
+def convert_byte_size(byte_size, unit):
+    """
+    将byte转为指定单位，默认转为MB
+    """
+    # units = {
+    #     "K": 1 << 10,
+    #     "M": 1 << 20,
+    #     "G": 1 << 30
+    # }
+    # unit = units.get(unit, units['M'])
+    # return round(byte_size / unit, 2)
+    if unit == 'K':
+        return round(byte_size / (1 << 10), 2)
+    if unit == 'G':
+        return round(byte_size / (1 << 30), 2)
+    return round(byte_size / (1 << 20), 2)
