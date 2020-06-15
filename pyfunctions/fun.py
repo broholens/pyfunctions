@@ -12,24 +12,10 @@ import requests
 import html2text
 import w3lib.url  # import w3lib 报错
 import w3lib.encoding
-import fake_useragent
+from faker import Faker
 from lxml.html import etree
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
-
-def make_useragent():
-    """获取useragents并保存到本地，返回UserAgent对象"""
-    version = fake_useragent.VERSION
-    resp = requests.get("https://fake-useragent.herokuapp.com/browsers/" + version)
-    useragent_filename = "fake_useragent.json"
-    if not os.path.exists(useragent_filename):
-        with open(useragent_filename, "w") as f:
-            json.dump(resp.json(), f)
-    return fake_useragent.UserAgent(path=useragent_filename)
-
-
-ua = make_useragent()
 
 
 def query_param(url, param):
@@ -65,9 +51,7 @@ def resp2html(response):
     """获取response的html 自动处理了encoding"""
     content_type = response.headers.get("content-type")
     auto_detect_fun = lambda x: chardet.detect(x).get("encoding")
-    _, html = w3lib.encoding.html_to_unicode(
-        content_type, response.content, auto_detect_fun=auto_detect_fun
-    )
+    _, html = w3lib.encoding.html_to_unicode(content_type, response.content, auto_detect_fun=auto_detect_fun)
     return html
 
 
@@ -83,7 +67,7 @@ def get_url(url, timeout=5, **kwargs):
     """requests get封装"""
     try:
         if "headers" in kwargs:
-            kwargs["headers"].update({"User-Agent": ua.random})
+            kwargs["headers"].update({"User-Agent": Faker().user_agent()})
         return requests.get(url, timeout=timeout, **kwargs)
     except:
         return
@@ -93,7 +77,7 @@ def post_data(url, data, **kwargs):
     """requests post封装"""
     try:
         if "headers" in kwargs:
-            kwargs["headers"].update({"User-Agent": ua.random})
+            kwargs["headers"].update({"User-Agent": Faker().user_agent()})
         return requests.post(url, json=data, **kwargs)
     except:
         return
@@ -127,10 +111,10 @@ def load_cookies(filename):
 def make_driver(driver="chrome", load_img=False):
     """只支持chrome和phantomjs"""
     driver = driver.lower()
+    ua = Faker().user_agent()
     if driver == "phantomjs":
         dcap = dict(DesiredCapabilities.PHANTOMJS)
-        dcap[
-            "phantomjs.page.settings.userAgent"] = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36"
+        dcap["phantomjs.page.settings.userAgent"] = ua
         dcap["phantomjs.page.settings.loadImages"] = load_img
         d = webdriver.PhantomJS(desired_capabilities=dcap)
     elif driver == "chrome":
@@ -148,17 +132,14 @@ def make_driver(driver="chrome", load_img=False):
         # 解决window.navigator.webdriver=True的问题
         # https://wwwhttps://www.cnblogs.com/presleyren/p/10771000.html.cnblogs.com/presleyren/p/10771000.html
         ops.add_experimental_option("excludeSwitches", ["enable-automation"])
-        ops.add_argument(
-            'user-agent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36"')
+        ops.add_argument(f'user-agent={Faker().user_agent()}')
         try:
             # selenium兼容问题
             d = webdriver.Chrome(options=ops)
         except:
             d = webdriver.Chrome(chrome_options=ops)
     else:
-        raise ValueError(
-            "Unknown argument %s. Support chrome and phantomjs only." % driver
-        )
+        raise ValueError("Unknown argument %s. Support chrome and phantomjs only." % driver)
     d.set_window_size(1024, 786)
     return d
 
@@ -191,6 +172,7 @@ def save_response_content(response, output_file):
 def get_dir_size(dir_path, unit='M', include_type=(".*",)):
     """
     获取指定文件夹大小
+    :param dir_path: 指定目录
     :param unit: 返回单位: K, M, G
     :param include_type: 包含的文件类型：.*表示全部
     :return:
