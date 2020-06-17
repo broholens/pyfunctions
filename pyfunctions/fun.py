@@ -218,7 +218,7 @@ def string2bool(s):
     raise ValueError(f"Illegal value: {s}.")
 
 
-def load_json_file(file_path):
+def load_json_file(file_path, encoding='utf-8'):
     """加载json文件"""
-    content = pathlib.Path(file_path).read_text()
+    content = pathlib.Path(file_path).read_text(encoding=encoding)
     return json.loads(content)
