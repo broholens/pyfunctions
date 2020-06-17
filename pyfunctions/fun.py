@@ -15,7 +15,6 @@ import w3lib.encoding
 from faker import Faker
 from lxml.html import etree
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 def query_param(url, param):
@@ -108,39 +107,30 @@ def load_cookies(filename):
     return cookies
 
 
-def make_driver(driver="chrome", load_img=False):
+def make_driver(load_img=False, headless=False):
     """只支持chrome和phantomjs"""
-    driver = driver.lower()
-    ua = Faker().user_agent()
-    if driver == "phantomjs":
-        dcap = dict(DesiredCapabilities.PHANTOMJS)
-        dcap["phantomjs.page.settings.userAgent"] = ua
-        dcap["phantomjs.page.settings.loadImages"] = load_img
-        d = webdriver.PhantomJS(desired_capabilities=dcap)
-    elif driver == "chrome":
-        # 创建chrome并配置
-        ops = webdriver.ChromeOptions()
+    # 创建chrome并配置
+    ops = webdriver.ChromeOptions()
+    if headless:
         ops.add_argument("--headless")
-        ops.add_argument("--no-sandbox")
-        ops.add_argument("--disable-gpu")
-        ops.add_argument("--start-maximized")
-        # ops.add_argument('--incognito')
-        ops.add_argument("lang=zh_CN")
-        if load_img is False:
-            prefs = {"profile.managed_default_content_settings.images": 2}
-            ops.add_experimental_option("prefs", prefs)
-        # 解决window.navigator.webdriver=True的问题
-        # https://wwwhttps://www.cnblogs.com/presleyren/p/10771000.html.cnblogs.com/presleyren/p/10771000.html
-        ops.add_experimental_option("excludeSwitches", ["enable-automation"])
-        ops.add_argument(f'user-agent={Faker().user_agent()}')
-        try:
-            # selenium兼容问题
-            d = webdriver.Chrome(options=ops)
-        except:
-            d = webdriver.Chrome(chrome_options=ops)
-    else:
-        raise ValueError("Unknown argument %s. Support chrome and phantomjs only." % driver)
-    d.set_window_size(1024, 786)
+    ops.add_argument("--no-sandbox")
+    ops.add_argument("--disable-gpu")
+    ops.add_argument("--start-maximized")
+    # ops.add_argument('--incognito')
+    ops.add_argument("lang=zh_CN")
+    if load_img is False:
+        prefs = {"profile.managed_default_content_settings.images": 2}
+        ops.add_experimental_option("prefs", prefs)
+    # 解决window.navigator.webdriver=True的问题
+    # https://wwwhttps://www.cnblogs.com/presleyren/p/10771000.html.cnblogs.com/presleyren/p/10771000.html
+    ops.add_experimental_option("excludeSwitches", ["enable-automation"])
+    ops.add_argument(f'user-agent={Faker().user_agent()}')
+    try:
+        # selenium兼容问题
+        d = webdriver.Chrome(options=ops)
+    except:
+        d = webdriver.Chrome(chrome_options=ops)
+    d.maximize_window()
     return d
 
 
