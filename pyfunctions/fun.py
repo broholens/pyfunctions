@@ -208,3 +208,19 @@ def convert_byte_size(byte_size, unit):
     if unit == 'G':
         return round(byte_size / (1 << 30), 2)
     return round(byte_size / (1 << 20), 2)
+
+def string2bool(s):
+    """
+    将字符串'true'或'false'转换为bool类型的True或False
+    :param s: 字符串true或false
+    :return: 字符串对应的布尔值
+    """
+    if not s:
+        return False
+    if isinstance(s, bool):
+        return s
+    if s.lower() == 'true':
+        return True
+    if s.lower() == 'false':
+        return False
+    raise ValueError(f"Illegal value: {s}.")
