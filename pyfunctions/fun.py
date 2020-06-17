@@ -5,6 +5,7 @@ import random
 import glob
 import shutil
 import json
+import pathlib
 from os import walk
 from os.path import join, splitext, getsize
 import chardet
@@ -215,3 +216,9 @@ def string2bool(s):
     if s.lower() == 'false':
         return False
     raise ValueError(f"Illegal value: {s}.")
+
+
+def load_json_file(file_path):
+    """加载json文件"""
+    content = pathlib.Path(file_path).read_text()
+    return json.loads(content)
