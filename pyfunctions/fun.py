@@ -209,6 +209,7 @@ def convert_byte_size(byte_size, unit):
         return round(byte_size / (1 << 30), 2)
     return round(byte_size / (1 << 20), 2)
 
+
 def string2bool(s):
     """
     将字符串'true'或'false'转换为bool类型的True或False
